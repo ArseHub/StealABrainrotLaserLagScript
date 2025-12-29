@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Laser Shop</title>
+<style>
+/* General */
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #000000, #0a0a0a);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: none; /* hide default cursor */
+  overflow: hidden;
+  position: relative;
+}
+
+/* CROSSHAIR FOLLOW CURSOR */
+.crosshair {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.crosshair::before,
+.crosshair::after {
+  content: '';
+  position: absolute;
+  background: #00f0ff;
+}
+
+.crosshair::before {
+  width: 2px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.crosshair::after {
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+/* NEON GLOW BEHIND CARD */
+.card-wrapper {
+  position: relative;
+}
+
+.card-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  border-radius: 20px;
+  background: linear-gradient(45deg, #00f0ff, #0040ff, #00f0ff, #0040ff);
+  background-size: 400% 400%;
+  filter: blur(10px);
+  z-index: -1;
+  animation: neonGlow 6s ease infinite;
+}
+
+@keyframes neonGlow {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+/* CARDS */
+.card {
+  width: 260px; /* smaller box */
+  background: #0b0b0b;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 20px #00f0ff80, 0 0 40px #00f0ff30 inset;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.hidden {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+  position: absolute;
+}
+
+.product-img {
+  width: 150px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 0 20px #00f0ff;
+}
+
+h2 {
+  margin: 10px 0;
+  color: #00f0ff;
+}
+
+.price {
+  margin: 10px 0 20px;
+  color: #00ffff;
+  font-size: 16px;
+}
+
+/* BUTTONS WITH ICONS */
+button {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border: none;
+  border-radius: 12px;
+  background: #000000;
+  color: #00f0ff;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 5px #00f0ff, 0 0 15px #00f0ff inset;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+button:hover {
+  box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff inset;
+  transform: translateY(-2px);
+}
+
+.checkout-text {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+
+.discord {
+  color: #00f0ff;
+  font-weight: bold;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 70px;
+  padding: 8px;
+  border: none;
+  border-radius: 12px;
+  background: #000000;
+  color: #00f0ff;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 5px #00f0ff, 0 0 15px #00f0ff inset;
+  transition: all 0.3s;
+}
+
+.back-btn:hover {
+  box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff inset;
+  transform: translateY(-2px);
+}
+</style>
+</head>
+<body>
+
+<!-- CROSSHAIR -->
+<div class="crosshair" id="crosshair"></div>
+
+<!-- PRODUCT CARD -->
+<div class="card-wrapper">
+<div class="card" id="productCard">
+  <img src="https://tse3.mm.bing.net/th/id/OIP.ZZk6mt7BcughXTnwH9sZXgAAAA?rs=1&pid=ImgDetMain&o=7&rm=3" class="product-img" alt="Laser Lag Script">
+  <h2>Laser Lag Script</h2>
+  <div class="price">500 Robux</div>
+  <button onclick="openOptions()">Select Option</button>
+</div>
+</div>
+
+<!-- OPTIONS CARD -->
+<div class="card-wrapper hidden" id="optionsWrapper">
+<div class="card" id="optionsCard">
+  <h2>Choose Payment</h2>
+  <button onclick="checkout('Robux')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Robux_Icon.png/32px-Robux_Icon.png" alt="Robux"> Pay with Robux</button>
+  <button onclick="checkout('Brainrots')"><img src="https://cdn-icons-png.flaticon.com/32/528/528205.png" alt="Brainrots"> Pay with Brainrots</button>
+</div>
+</div>
+
+<!-- CHECKOUT CARD -->
+<div class="card-wrapper hidden" id="checkoutWrapper">
+<div class="card" id="checkoutCard">
+  <h2>Checkout</h2>
+  <div class="checkout-text">
+    To complete your purchase,<br>
+    add <span class="discord">yt_soccerksa</span> on Discord.<br><br>
+    Payment method: <strong id="methodText"></strong>
+  </div>
+</div>
+</div>
+
+<!-- BACK BUTTON -->
+<button class="back-btn hidden" id="backBtn" onclick="goBack()">Back</button>
+
+<script>
+// CARD LOGIC
+function openOptions() {
+  switchCard("productCard", "optionsWrapper");
+  document.getElementById("backBtn").classList.remove("hidden");
+}
+
+function checkout(method) {
+  document.getElementById("methodText").textContent = method;
+  switchCard("optionsWrapper", "checkoutWrapper");
+}
+
+function goBack() {
+  if (!document.getElementById("checkoutWrapper").classList.contains("hidden")) {
+    switchCard("checkoutWrapper", "optionsWrapper");
+  } else if (!document.getElementById("optionsWrapper").classList.contains("hidden")) {
+    switchCard("optionsWrapper", "productCard");
+    document.getElementById("backBtn").classList.add("hidden");
+  }
+}
+
+function switchCard(from, to) {
+  document.getElementById(from).classList.add("hidden");
+  setTimeout(() => {
+    document.getElementById(to).classList.remove("hidden");
+  }, 200);
+}
+
+// CROSSHAIR FOLLOW CURSOR
+const crosshair = document.getElementById('crosshair');
+document.addEventListener('mousemove', e => {
+  crosshair.style.left = e.clientX + 'px';
+  crosshair.style.top = e.clientY + 'px';
+});
+</script>
+</body>
+</html>
